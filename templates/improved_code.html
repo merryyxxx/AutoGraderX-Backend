@@ -1,0 +1,87 @@
+{% extends 'layout.html' %}
+
+{% block title %}Improved Code{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Improved Code</h1>
+    
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Original Code</h5>
+                </div>
+                <div class="card-body">
+                    <pre><code class="language-python">{{ submission.code }}</code></pre>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="mb-0">Improved Code</h5>
+                </div>
+                <div class="card-body">
+                    {% if "in progress" in submission.restructured_code %}
+                        <div class="alert alert-info">
+                            <div class="d-flex align-items-center">
+                                <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                                <span>Code restructuring in progress... This may take a minute.</span>
+                            </div>
+                        </div>
+                    {% elif "Error during" in submission.restructured_code %}
+                        <div class="alert alert-danger">
+                            <p>{{ submission.restructured_code }}</p>
+                            <p class="mb-0 mt-2">Please try refreshing the analysis.</p>
+                        </div>
+                    {% else %}
+                        <pre><code class="language-python">{{ submission.restructured_code }}</code></pre>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('view_analysis', submission_id=submission.id) }}" class="btn btn-primary">View Analysis</a>
+        <a href="{{ url_for('view_grade', submission_id=submission.id) }}" class="btn btn-info">View Grade</a>
+        <a href="{{ url_for('refresh_analysis', submission_id=submission.id) }}" class="btn btn-secondary">Refresh Analysis</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    // Function to check if code restructuring is complete
+    function checkImprovedCodeStatus() {
+        fetch('/check_analysis_status/{{ submission.id }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.restructured_code_ready) {
+                    location.reload();
+                } else {
+                    setTimeout(checkImprovedCodeStatus, 5000); // Check again in 5 seconds
+                }
+            })
+            .catch(error => {
+                console.error('Error checking status:', error);
+                setTimeout(checkImprovedCodeStatus, 10000); // Retry in 10 seconds if error
+            });
+    }
+    
+    // Start checking if code restructuring is in progress
+    {% if "in progress" in submission.restructured_code %}
+        setTimeout(checkImprovedCodeStatus, 5000);
+    {% endif %}
+    
+    // Apply syntax highlighting if highlight.js is available
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof hljs !== 'undefined') {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightBlock(block);
+            });
+        }
+    });
+</script>
+{% endblock %}

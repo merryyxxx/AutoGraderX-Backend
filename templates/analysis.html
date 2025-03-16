@@ -1,0 +1,174 @@
+{% extends 'layout.html' %}
+
+{% block title %}Code Analysis{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Code Analysis</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Original Code</h5>
+            <div>
+                <span class="badge bg-primary">{{ submission.language or 'Unknown' }}</span>
+                <small class="text-muted ms-2">Submitted on {{ submission.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+            </div>
+        </div>
+        <div class="card-body">
+            <pre><code class="language-{{ submission.language|lower if submission.language else 'python' }}">{{ submission.code }}</code></pre>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Line-by-Line Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div id="analysis-content">
+                        {% if submission.line_analysis and 'in progress' not in submission.line_analysis.lower() %}
+                            <div class="analysis-container">
+                                {% set analysis_points = submission.line_analysis.split('\n\n') %}
+                                {% for point in analysis_points %}
+                                    {% if point.strip() %}
+                                        <div class="analysis-point">
+                                            <div class="point-number">{{ loop.index }}</div>
+                                            <div class="point-content">
+                                                {{ point | safe }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                            <div class="analysis-loading text-center p-5">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <p class="mt-3">Analysis in progress... This may take a few moments.</p>
+                                <div class="progress mt-3">
+                                    <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('view_grade', submission_id=submission.id) }}" class="btn btn-primary">View Grade</a>
+        <a href="{{ url_for('view_improved_code', submission_id=submission.id) }}" class="btn btn-success">View Improved Code</a>
+        <a href="{{ url_for('refresh_analysis', submission_id=submission.id) }}" class="btn btn-secondary">Refresh Analysis</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<style>
+    .analysis-container {
+        padding: 0 10px;
+    }
+    
+    .analysis-point {
+        position: relative;
+        background-color: #ffffff;
+        border: 1px solid #dee2e6;
+        border-radius: 15px;
+        padding: 15px 20px 15px 35px;
+        margin-bottom: 20px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .point-number {
+        position: absolute;
+        left: -15px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 30px;
+        height: 30px;
+        background-color: #6c757d;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        font-size: 14px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+    
+    .point-content {
+        font-size: 0.95rem;
+    }
+    
+    .point-content code {
+        background-color: #f8f9fa;
+        padding: 2px 4px;
+        border-radius: 3px;
+        font-size: 0.9em;
+    }
+    
+    @media (min-width: 768px) {
+        .analysis-container {
+            padding: 0 20px;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const submissionId = {{ submission.id }};
+        const analysisContent = document.getElementById('analysis-content');
+        
+        // Only run polling if analysis is in progress
+        if (analysisContent && analysisContent.innerHTML.includes('in progress')) {
+            // Function to check analysis status
+            function checkStatus() {
+                fetch(`/check_analysis_status/${submissionId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('Analysis status:', data);
+                        
+                        // If analysis is complete, refresh the page
+                        if (data.analysis_status === 'complete') {
+                            location.reload();
+                        } else if (data.analysis_status === 'error') {
+                            // If there's an error, show an error message and stop polling
+                            analysisContent.innerHTML = `
+                                <div class="alert alert-danger">
+                                    <strong>Analysis Error:</strong> There was an error processing your code. 
+                                    <a href="/refresh_analysis/${submissionId}" class="alert-link">Click here</a> to try again.
+                                </div>`;
+                            clearInterval(statusInterval);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error checking analysis status:', error);
+                    });
+            }
+            
+            // Check status immediately and then every 3 seconds
+            checkStatus();
+            const statusInterval = setInterval(checkStatus, 3000);
+            
+            // Clean up interval after 5 minutes to prevent endless polling
+            setTimeout(() => {
+                clearInterval(statusInterval);
+                // If it's still showing "in progress" after 5 minutes, show a message
+                if (analysisContent.innerHTML.includes('in progress')) {
+                    const loadingDiv = document.querySelector('.analysis-loading');
+                    if (loadingDiv) {
+                        loadingDiv.innerHTML += `
+                            <div class="alert alert-warning mt-3">
+                                <strong>Taking longer than expected.</strong> The analysis might be stuck. 
+                                <a href="/refresh_analysis/${submissionId}" class="alert-link">Click here</a> to restart the analysis.
+                            </div>`;
+                    }
+                }
+            }, 300000); // 5 minutes
+        }
+    });
+</script>
+{% endblock %}

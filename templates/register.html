@@ -1,0 +1,242 @@
+{% extends "layout.html" %}
+
+{% block extra_head %}
+<style>
+    .register-container {
+        max-width: 450px;
+        margin: 3rem auto;
+        padding: 2.5rem;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .register-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(74, 108, 247, 0.15);
+    }
+    
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: #444;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+        border: 2px solid #e8e8e8;
+        border-radius: 8px;
+        font-family: 'Roboto', sans-serif;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        background-color: #f9fafc;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
+    }
+    
+    .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 0.9rem;
+        background-color: #4a6cf7;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(74, 108, 247, 0.25);
+    }
+    
+    .btn-primary:hover {
+        background-color: #3a5ce5;
+        box-shadow: 0 6px 15px rgba(74, 108, 247, 0.35);
+        transform: translateY(-2px);
+    }
+    
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+    
+    .login-link {
+        text-align: center;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eaeaea;
+        font-size: 0.95rem;
+    }
+    
+    .login-link a {
+        color: #4a6cf7;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .login-link a:hover {
+        color: #3a5ce5;
+        text-decoration: underline;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .form-header i {
+        font-size: 2.5rem;
+        color: #4a6cf7;
+        margin-bottom: 1.25rem;
+        display: inline-block;
+        background: linear-gradient(135deg, #4a6cf7, #6a4cf7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .form-header h1 {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+    
+    .form-header p {
+        color: #666;
+        font-size: 1.05rem;
+    }
+    
+    .password-requirements {
+        margin-top: -1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.85rem;
+        color: #777;
+    }
+    
+    .password-match-indicator {
+        display: flex;
+        align-items: center;
+        font-size: 0.85rem;
+        margin-top: 0.5rem;
+        height: 1.5rem;
+    }
+    
+    .password-match-indicator i {
+        margin-right: 0.5rem;
+    }
+    
+    .match {
+        color: #28a745;
+    }
+    
+    .no-match {
+        color: #dc3545;
+    }
+    
+    .hidden {
+        visibility: hidden;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="register-container">
+    <div class="form-header">
+        <i class="fas fa-user-plus"></i>
+        <h1>Join AutoGraderX</h1>
+        <p>Create your account and start your coding journey</p>
+    </div>
+    <form method="POST" action="{{ url_for('register') }}">
+        <div class="form-group">
+            <label for="username">Email Address</label>
+            <input type="email" class="form-control" id="username" name="username" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+            <div class="password-requirements">
+                Create a strong password with at least 8 characters
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="confirm_password">Confirm Password</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" placeholder="••••••••" required>
+            <div class="password-match-indicator hidden">
+                <i class="fas fa-check-circle"></i> Passwords match
+            </div>
+        </div>
+        <button type="submit" class="btn-primary">Create Account</button>
+    </form>
+    <div class="login-link">
+        Already have an account? <a href="{{ url_for('login') }}">Sign in</a>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Enhanced password validation
+    const passwordInput = document.getElementById('password');
+    const confirmInput = document.getElementById('confirm_password');
+    const matchIndicator = document.querySelector('.password-match-indicator');
+    const matchIcon = matchIndicator.querySelector('i');
+    const matchText = matchIndicator.lastChild;
+    
+    // Check passwords on input
+    function checkPasswords() {
+        if (confirmInput.value.length === 0) {
+            matchIndicator.classList.add('hidden');
+            return;
+        }
+        
+        matchIndicator.classList.remove('hidden');
+        
+        if (passwordInput.value === confirmInput.value) {
+            matchIndicator.classList.add('match');
+            matchIndicator.classList.remove('no-match');
+            matchIcon.classList.remove('fa-times-circle');
+            matchIcon.classList.add('fa-check-circle');
+            matchText.textContent = ' Passwords match';
+        } else {
+            matchIndicator.classList.add('no-match');
+            matchIndicator.classList.remove('match');
+            matchIcon.classList.remove('fa-check-circle');
+            matchIcon.classList.add('fa-times-circle');
+            matchText.textContent = ' Passwords do not match';
+        }
+    }
+    
+    passwordInput.addEventListener('input', checkPasswords);
+    confirmInput.addEventListener('input', checkPasswords);
+    
+    // Form submission validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const password = passwordInput.value;
+        const confirmPassword = confirmInput.value;
+        
+        if (password !== confirmPassword) {
+            e.preventDefault();
+            matchIndicator.classList.remove('hidden');
+            matchIndicator.classList.add('no-match');
+            matchIndicator.classList.remove('match');
+            matchIcon.classList.remove('fa-check-circle');
+            matchIcon.classList.add('fa-times-circle');
+            matchText.textContent = ' Passwords do not match';
+        }
+    });
+</script>
+{% endblock %}

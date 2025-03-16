@@ -1,0 +1,273 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - AutoGraderX{% endblock %}
+
+{% block content %}
+<!-- Error Alert - Will only show if there's an error -->
+<div id="dashboard-error-alert" class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="display: none;">
+    <strong>Error!</strong> An error occurred while loading your dashboard. 
+    <button type="button" id="retry-load-dashboard" class="btn btn-sm btn-outline-danger ms-3">Try Again</button>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-8">
+        <h1 class="fw-bold mb-3">Welcome to Your Dashboard</h1>
+        <p class="lead">Submit your code for comprehensive AI-powered analysis.</p>
+    </div>
+    <div class="col-md-4 text-md-end">
+        <a href="{{ url_for('submission_history') }}" class="btn btn-outline-primary">
+            <i class="fas fa-history me-2"></i>View All Submissions
+        </a>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <i class="fas fa-code-branch"></i>
+                <div class="number">{{ past_submissions|length if past_submissions else 0 }}</div>
+                <div class="label">Recent Submissions</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <i class="fas fa-check-circle"></i>
+                <div class="number">
+                    {% set completed = 0 %}
+                    {% if past_submissions %}
+                        {% for sub in past_submissions %}
+                            {% if sub.grade and not sub.grade.endswith('in progress...') %}
+                                {% set completed = completed + 1 %}
+                            {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    {{ completed }}
+                </div>
+                <div class="label">Completed Analyses</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card stats-card">
+            <div class="card-body">
+                <i class="fas fa-clock"></i>
+                <div class="number">
+                    {% if past_submissions and past_submissions|length > 0 and past_submissions[0].timestamp %}
+                        {{ past_submissions[0].timestamp.strftime('%b %d') }}
+                    {% else %}
+                        -
+                    {% endif %}
+                </div>
+                <div class="label">Last Submission</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-8 mb-4">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="fas fa-code me-2"></i>Submit New Code</h5>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('submit_code') }}" method="post">
+                    <div class="mb-3">
+                        <label for="code" class="form-label">Your Code:</label>
+                        <textarea id="code" name="code" class="form-control code-editor" rows="12" placeholder="// Paste your code here..." required></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-paper-plane me-2"></i>Submit for Analysis
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>Recent Submissions</h5>
+            </div>
+            <div class="card-body p-0" id="recent-submissions-container">
+                {% if past_submissions and past_submissions|length > 0 %}
+                <div class="list-group list-group-flush">
+                    {% for submission in past_submissions %}
+                    <a href="{{ url_for('view_analysis', submission_id=submission.id) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h6 class="mb-1 text-truncate" style="max-width: 200px;">
+                                {% if submission.code and submission.code.split('\n')|length > 0 %}
+                                    {{ submission.code.split('\n')[0][:30] }}
+                                    {% if submission.code.split('\n')[0]|length > 30 %}...{% endif %}
+                                {% else %}
+                                    [Empty submission]
+                                {% endif %}
+                            </h6>
+                            <small>{{ submission.timestamp.strftime('%b %d, %H:%M') if submission.timestamp else 'N/A' }}</small>
+                        </div>
+                        <div class="d-flex w-100 justify-content-between">
+                            <small class="text-muted">
+                                {% if submission.code %}
+                                    {{ (submission.code.split('\n')|length) }} lines
+                                {% else %}
+                                    0 lines
+                                {% endif %}
+                            </small>
+                            <small>
+                                {% if submission.grade and not submission.grade.endswith('in progress...') %}
+                                    {% if 'Grade: A' in submission.grade %}
+                                        <span class="badge bg-success">A</span>
+                                    {% elif 'Grade: B' in submission.grade %}
+                                        <span class="badge bg-primary">B</span>
+                                    {% elif 'Grade: C' in submission.grade %}
+                                        <span class="badge bg-warning text-dark">C</span>
+                                    {% elif 'Grade: D' in submission.grade %}
+                                        <span class="badge bg-danger">D</span>
+                                    {% elif 'Grade: F' in submission.grade %}
+                                        <span class="badge bg-danger">F</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">?</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-secondary">
+                                        <i class="fas fa-spinner fa-spin"></i>
+                                    </span>
+                                {% endif %}
+                            </small>
+                        </div>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center p-4">
+                    <i class="fas fa-code-branch fa-3x mb-3 text-muted"></i>
+                    <p>No submissions yet. Submit your first code for analysis!</p>
+                </div>
+                {% endif %}
+            </div>
+            {% if past_submissions and past_submissions|length > 0 %}
+            <div class="card-footer text-center">
+                <a href="{{ url_for('submission_history') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            {% endif %}
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Tips</h5>
+            </div>
+            <div class="card-body">
+                <div id="tipCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <div class="cartoon-bubble">
+                                <h6>Add Comments</h6>
+                                <p class="text-muted">Well-commented code helps our AI provide more accurate analysis.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="cartoon-bubble">
+                                <h6>Complete Snippets</h6>
+                                <p class="text-muted">Submit complete functions or classes rather than fragments for best results.</p>
+                            </div>
+                        </div>
+                        <div class="carousel-item">
+                            <div class="cartoon-bubble">
+                                <h6>Be Patient</h6>
+                                <p class="text-muted">Comprehensive analysis takes a few moments, especially for larger codebases.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Initialize code editor with syntax highlighting
+    document.addEventListener('DOMContentLoaded', function() {
+        const codeTextarea = document.getElementById('code');
+        if (codeTextarea) {
+            // Auto-resize code editor
+            codeTextarea.addEventListener('input', function() {
+                this.style.height = 'auto';
+                this.style.height = (this.scrollHeight) + 'px';
+            });
+        }
+        
+        // Initialize tip carousel
+        const tipCarousel = document.getElementById('tipCarousel');
+        if (tipCarousel && typeof bootstrap !== 'undefined' && bootstrap.Carousel) {
+            const carousel = new bootstrap.Carousel(tipCarousel, {
+                interval: 5000
+            });
+        }
+
+        // Error handling for dashboard loading
+        // Check if we need to show the error alert (based on URL parameter or server-side flash)
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('error') === 'dashboard-load') {
+            const errorAlert = document.getElementById('dashboard-error-alert');
+            if (errorAlert) {
+                errorAlert.style.display = 'block';
+                
+                // Add retry functionality
+                const retryButton = document.getElementById('retry-load-dashboard');
+                if (retryButton) {
+                    retryButton.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Attempt to load submissions via AJAX
+                        fetch('/api/submissions/recent')
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error('Network response was not ok');
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                // If successful, reload the page without the error parameter
+                                window.location.href = window.location.pathname;
+                            })
+                            .catch(error => {
+                                console.error('Error reloading submissions:', error);
+                                // Show a more specific error message
+                                alert('Unable to load submissions. Please try refreshing the page.');
+                            });
+                    });
+                }
+            }
+        }
+    });
+
+    // Function to handle errors when loading submissions
+    function handleSubmissionLoadError() {
+        const container = document.getElementById('recent-submissions-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="text-center p-4">
+                    <i class="fas fa-exclamation-triangle fa-3x mb-3 text-danger"></i>
+                    <p>An error occurred while loading your submissions.</p>
+                    <button id="retry-submissions" class="btn btn-sm btn-outline-primary">Try Again</button>
+                </div>
+            `;
+            
+            // Add retry button functionality
+            const retryButton = document.getElementById('retry-submissions');
+            if (retryButton) {
+                retryButton.addEventListener('click', function() {
+                    window.location.reload();
+                });
+            }
+        }
+    }
+</script>
+{% endblock %}

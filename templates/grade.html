@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}
+
+{% block title %}Code Grade{% endblock %}
+
+{% block content %}
+<div class="container my-4">
+    <h1 class="mb-4">Code Grade</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Original Code</h5>
+            <small class="text-muted">Submitted on {{ submission.timestamp.strftime('%Y-%m-%d %H:%M') }}</small>
+        </div>
+        <div class="card-body">
+            <pre><code class="language-python">{{ submission.code }}</code></pre>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Grade Assessment</h5>
+        </div>
+        <div class="card-body">
+            {% if "in progress" in submission.grade %}
+                <div class="alert alert-info">
+                    <div class="d-flex align-items-center">
+                        <div class="spinner-border spinner-border-sm me-2" role="status"></div>
+                        <span>Grading in progress... This may take a minute.</span>
+                    </div>
+                </div>
+            {% else %}
+                <div class="markdown-content">
+                    {{ submission.grade | safe }}
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <div class="d-flex gap-2 mb-4">
+        <a href="{{ url_for('view_analysis', submission_id=submission.id) }}" class="btn btn-primary">View Analysis</a>
+        <a href="{{ url_for('view_improved_code', submission_id=submission.id) }}" class="btn btn-success">View Improved Code</a>
+        <a href="{{ url_for('refresh_analysis', submission_id=submission.id) }}" class="btn btn-secondary">Refresh Analysis</a>
+        <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">Back to Dashboard</a>
+    </div>
+</div>
+
+<script>
+    // Function to check if grading is complete
+    function checkGradeStatus() {
+        fetch('/check_analysis_status/{{ submission.id }}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.grade_ready) {
+                    location.reload();
+                } else {
+                    setTimeout(checkGradeStatus, 5000); // Check again in 5 seconds
+                }
+            });
+    }
+    
+    // Start checking if grading is in progress
+    {% if "in progress" in submission.grade %}
+        setTimeout(checkGradeStatus, 5000);
+    {% endif %}
+</script>
+{% endblock %}

@@ -1,0 +1,198 @@
+{% extends "layout.html" %}
+
+{% block title %}Code Submission #{{ submission.id }} - Code Analyzer{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/default.min.css">
+<style>
+    .tab-content {
+        padding: 20px;
+        border-left: 1px solid #dee2e6;
+        border-right: 1px solid #dee2e6;
+        border-bottom: 1px solid #dee2e6;
+    }
+    pre {
+        padding: 15px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+    }
+    .markdown-content {
+        padding: 15px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Code Submission #{{ submission.id }}</h1>
+    <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="mb-0">Your Code</h3>
+            </div>
+            <div class="card-body">
+                <pre><code class="language-python">{{ submission.code }}</code></pre>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card shadow">
+            <div class="card-header bg-success text-white">
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow mb-4">
+    <div class="card-header bg-info text-white">
+        <h3 class="mb-0">Analysis Results</h3>
+    </div>
+    <div class="card-body">
+        <ul class="nav nav-tabs" id="analysisTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="grade-tab" data-bs-toggle="tab" href="#grade" role="tab">Grade</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="analysis-tab" data-bs-toggle="tab" href="#analysis" role="tab">Line Analysis</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="review-tab" data-bs-toggle="tab" href="#review" role="tab">Code Review</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="improved-tab" data-bs-toggle="tab" href="#improved" role="tab">Improved Code</a>
+            </li>
+        </ul>
+        <div class="tab-content" id="analysisTabsContent">
+            <div class="tab-pane fade show active" id="grade" role="tabpanel">
+                <div class="markdown-content" id="gradeContent">
+                    {% if submission.grade %}
+                        <div id="gradeMarkdown">{{ submission.grade }}</div>
+                    {% else %}
+                        <div class="alert alert-info">Grade is being generated. Please wait or refresh the page.</div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="analysis" role="tabpanel">
+                <div class="markdown-content" id="analysisContent">
+                    {% if submission.line_analysis %}
+                        <div id="analysisMarkdown">{{ submission.line_analysis }}</div>
+                    {% else %}
+                        <div class="alert alert-info">Analysis is being generated. Please wait or refresh the page.</div>
+                        <div class="text-center">
+                            <button id="loadAnalysisBtn" class="btn btn-primary">Load Analysis</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="review" role="tabpanel">
+                <div class="markdown-content" id="reviewContent">
+                    {% if submission.code_review %}
+                        <div id="reviewMarkdown">{{ submission.code_review }}</div>
+                    {% else %}
+                        <div class="alert alert-info">Code review is being generated. Please wait or refresh the page.</div>
+                        <div class="text-center">
+                            <button id="loadReviewBtn" class="btn btn-primary">Load Review</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="tab-pane fade" id="improved" role="tabpanel">
+                <div class="markdown-content" id="improvedContent">
+                    {% if submission.restructured_code %}
+                        <pre><code class="language-python" id="restructuredCode">{{ submission.restructured_code }}</code></pre>
+                    {% else %}
+                        <div class="alert alert-info">Improved code is being generated. Please wait or refresh the page.</div>
+                        <div class="text-center">
+                            <button id="loadRestructuredBtn" class="btn btn-primary">Load Improved Code</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Render markdown content
+        function renderMarkdown() {
+            const markdownElements = [
+                { id: 'gradeMarkdown', content: document.getElementById('gradeMarkdown') },
+                { id: 'analysisMarkdown', content: document.getElementById('analysisMarkdown') },
+                { id: 'reviewMarkdown', content: document.getElementById('reviewMarkdown') }
+            ];
+            
+            markdownElements.forEach(el => {
+                if (el.content) {
+                    el.content.innerHTML = marked.parse(el.content.textContent);
+                }
+            });
+            
+            // Highlight code blocks
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+        }
+        
+        renderMarkdown();
+        
+        // Load analysis if not already loaded
+        document.getElementById('loadAnalysisBtn')?.addEventListener('click', function() {
+            fetch('/code_analysis/{{ submission.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('analysisContent').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                    } else {
+                        document.getElementById('analysisContent').innerHTML = `<div id="analysisMarkdown">${data.analysis}</div>`;
+                        renderMarkdown();
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('analysisContent').innerHTML = `<div class="alert alert-danger">Error loading analysis: ${error}</div>`;
+                });
+        });
+        
+        // Load review if not already loaded
+        document.getElementById('loadReviewBtn')?.addEventListener('click', function() {
+            fetch('/code_review/{{ submission.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('reviewContent').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                    } else {
+                        document.getElementById('reviewContent').innerHTML = `<div id="reviewMarkdown">${data.review}</div>`;
+                        renderMarkdown();
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('reviewContent').innerHTML = `<div class="alert alert-danger">Error loading review: ${error}</div>`;
+                });
+        });
+        
+        // Load restructured code if not already loaded
+        document.getElementById('loadRestructuredBtn')?.addEventListener('click', function() {
+            fetch('/code_restructure/{{ submission.id }}')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        document.getElementById('improvedContent').innerHTML = `<div class="alert alert-danger">${data.error}</div>`;
+                    } else {
+                        document.getElementById('improvedContent').innerHTML = `<pre><code class="language-python" id="restructuredCode">${data.restructured_code}</code></pre>`;
+                        renderMarkdown();
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('improvedContent').innerHTML = `<div class="alert alert-danger">Error loading improved code: ${error}</div>`;
+                });
+        });
+    });
+</script>
+{% endblock %}

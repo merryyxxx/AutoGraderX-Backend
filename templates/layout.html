@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AutoGraderX{% endblock %}</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Google Fonts - Comic Neue and Fira Code -->
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    
+    <!-- Custom CSS -->
+    <style>
+        :root {
+            --primary-color: #FF69B4; /* Hot Pink */
+            --secondary-color: #DA70D6; /* Orchid */
+            --success-color: #FF85FF; /* Light Pink */
+            --light-color: #FFF0F5; /* Lavender Blush */
+            --dark-color: #8B008B; /* Dark Magenta */
+            --code-bg: #282c34;
+        }
+        
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #FFF0F5;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ff69b4' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+        
+        .navbar {
+            background-color: var(--primary-color);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-bottom: 3px dashed #fff;
+            padding-top: 0;
+            padding-bottom: 0;
+            min-height: 56px;
+        }
+        
+        .navbar-brand {
+            font-weight: 700;
+            color: white !important;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.2);
+            display: flex;
+            align-items: center;
+            height: 100%;
+        }
+        
+        .navbar-logo {
+            height: 56px;
+            width: auto;
+            object-fit: contain;
+            margin-right: 10px;
+        }
+        
+        .navbar .nav-link {
+            color: white !important;
+            font-weight: 700;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border-radius: 20px;
+            margin: 0 5px;
+        }
+        
+        .navbar .nav-link:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .navbar .active {
+            background-color: var(--secondary-color);
+            border-radius: 20px;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 20px;
+            border: 3px solid var(--primary-color);
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px) rotate(1deg);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+        }
+        
+        .card-header {
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            font-weight: 700;
+            font-size: 1.3rem;
+            border-radius: 17px 17px 0 0 !important;
+            padding: 15px;
+            text-shadow: 1px 1px 0px rgba(0,0,0,0.2);
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            transition: all 0.3s ease;
+            border-radius: 30px;
+            font-weight: bold;
+            padding: 10px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+            border-color: var(--secondary-color);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+            border-radius: 30px;
+            font-weight: bold;
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        .form-control {
+            border-radius: 20px;
+            border: 2px solid #ddd;
+            padding: 12px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 0.25rem rgba(218, 112, 214, 0.25);
+        }
+        
+        .code-editor {
+            font-family: 'Fira Code', monospace;
+            line-height: 1.6;
+            border-radius: 15px;
+            border: 2px dashed var(--primary-color);
+            background-color: var(--code-bg);
+            color: #abb2bf;
+            padding: 15px;
+            min-height: 300px;
+        }
+        
+        /* For code display */
+        pre {
+            background-color: var(--code-bg);
+            color: #abb2bf;
+            border-radius: 15px;
+            padding: 15px;
+            font-family: 'Fira Code', monospace;
+            overflow-x: auto;
+            border: 2px dashed var(--primary-color);
+        }
+        
+        .analysis-section {
+            padding: 20px;
+            background-color: white;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            border: 2px solid var(--primary-color);
+        }
+        
+        .analysis-header {
+            color: var(--primary-color);
+            border-bottom: 3px dashed var(--primary-color);
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        
+        .grade-badge {
+            font-size: 2.5rem;
+            padding: 15px 25px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-bottom: 15px;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            border: 3px solid white;
+            font-weight: bold;
+            font-family: 'Comic Neue', cursive;
+        }
+        
+        .grade-A {
+            background-color: #FF85FF;
+            color: white;
+        }
+        
+        .grade-B {
+            background-color: #FFACFC;
+            color: white;
+        }
+        
+        .grade-C {
+            background-color: #FFBEEF;
+            color: white;
+        }
+        
+        .grade-D {
+            background-color: #FFC6D9;
+            color: white;
+        }
+        
+        .grade-F {
+            background-color: #FF9999;
+            color: white;
+        }
+        
+        .progress-spinner {
+            width: 3rem;
+            height: 3rem;
+            color: var(--primary-color);
+        }
+        
+        footer {
+            margin-top: auto;
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px 0;
+            border-top: 3px dashed #fff;
+        }
+        
+        .flash-messages {
+            position: fixed;
+            top: 70px;
+            right: 20px;
+            z-index: 1050;
+            min-width: 300px;
+        }
+        
+        .flash-message {
+            margin-bottom: 10px;
+            animation: bounceIn 0.5s ease forwards;
+            border-radius: 15px;
+            border: 2px solid #fff;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+        
+        /* Dashboard cards */
+        .stats-card {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            border: 3px solid var(--primary-color);
+        }
+        
+        .stats-card i {
+            font-size: 3rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+        }
+        
+        .stats-card .number {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--dark-color);
+        }
+        
+        .stats-card .label {
+            font-size: 1.2rem;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        /* Tabs styling */
+        .nav-tabs .nav-link {
+            color: var(--dark-color);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+            font-weight: bold;
+            margin-right: 5px;
+            background-color: rgba(255,255,255,0.7);
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: white;
+            background-color: var(--primary-color);
+            font-weight: 600;
+            box-shadow: 0 -4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .nav-tabs {
+            border-bottom: 3px dashed var(--primary-color);
+            padding-bottom: 5px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Custom cartoon elements */
+        .cartoon-bubble {
+            position: relative;
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: 3px solid var(--primary-color);
+        }
+        
+        .cartoon-bubble:after {
+            content: '';
+            position: absolute;
+            bottom: -20px;
+            left: 30px;
+            border-width: 20px 0 0 20px;
+            border-style: solid;
+            border-color: var(--primary-color) transparent;
+            display: block;
+            width: 0;
+        }
+        
+        .cartoon-badge {
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50px;
+            padding: 5px 15px;
+            font-weight: bold;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: inline-block;
+            margin: 5px;
+            border: 2px solid white;
+        }
+        
+        /* Circular logo styling */
+        .circular-logo {
+            border-radius: 50%;
+            width: 250px;
+            height: 250px;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s ease;
+        }
+        
+        .circular-logo:hover {
+            transform: rotate(10deg) scale(1.05);
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/logo11.png') }}" alt="AutoGraderX Logo" class="navbar-logo">
+                AutoGraderX
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('home') %}active{% endif %}" href="{{ url_for('home') }}">
+                            <i class="fas fa-home me-1"></i> Home
+                        </a>
+                    </li>
+                    {% if is_logged_in() %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('dashboard') %}active{% endif %}" href="{{ url_for('dashboard') }}">
+                            <i class="fas fa-tachometer-alt me-1"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('submission_history') %}active{% endif %}" href="{{ url_for('submission_history') }}">
+                            <i class="fas fa-history me-1"></i> History
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('logout') }}">
+                            <i class="fas fa-sign-out-alt me-1"></i> Logout
+                        </a>
+                    </li>
+                    {% else %}
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('login') %}active{% endif %}" href="{{ url_for('login') }}">
+                            <i class="fas fa-sign-in-alt me-1"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.path == url_for('register') %}active{% endif %}" href="{{ url_for('register') }}">
+                            <i class="fas fa-user-plus me-1"></i> Register
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Flash Messages -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category if category not in ['error'] else 'danger' }} alert-dismissible fade show flash-message">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    
+    <!-- Main Content -->
+    <main class="container py-4">
+        {% block content %}{% endblock %}
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>AutoGraderX</h5>
+                    <p class="text-white">Elevate your code quality with cute AI-powered analysis!</p>
+                </div>
+                <div class="col-md-4 mb-3 mb-md-0">
+                    <h5>Links</h5>
+                    <ul class="list-unstyled">
+                        <li><a href="{{ url_for('terms') }}" class="text-white">Terms of Service</a></li>
+                        <li><a href="{{ url_for('privacy') }}" class="text-white">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-4">
+                    <h5>Connect</h5>
+                    <div class="d-flex justify-content-center">
+                        <a href="#" class="text-white me-3"><i class="fab fa-github fa-2x"></i></a>
+                        <a href="#" class="text-white me-3"><i class="fab fa-twitter fa-2x"></i></a>
+                        <a href="#" class="text-white"><i class="fab fa-linkedin fa-2x"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <small>&copy; 2025 AutoGraderX. All rights reserved.</small>
+            </div>
+        </div>
+    </footer>
+    
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Highlight.js for code syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
+    
+    <!-- Common JS -->
+    <script>
+        // Initialize syntax highlighting
+        document.addEventListener('DOMContentLoaded', (event) => {
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
+            });
+            
+            // Auto-dismiss flash messages after 5 seconds
+            setTimeout(() => {
+                document.querySelectorAll('.flash-message').forEach(el => {
+                    let bsAlert = new bootstrap.Alert(el);
+                    bsAlert.close();
+                });
+            }, 5000);
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

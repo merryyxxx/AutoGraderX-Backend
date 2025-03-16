@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+
+{% block title %}Submission History - AutoGraderX{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h2 class="text-center mb-4">Submission History</h2>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="mb-0"><i class="fas fa-history me-2"></i>Your Past Submissions</h4>
+                </div>
+                <div class="card-body">
+                    {% if submissions and submissions|length > 0 %}
+                    <div class="list-group list-group-flush">
+                        {% for submission in submissions %}
+                        <a href="{{ url_for('view_analysis', submission_id=submission.id) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1 text-truncate" style="max-width: 400px;">
+                                    {% if submission.code and submission.code.split('\n')|length > 0 %}
+                                        {{ submission.code.split('\n')[0][:50] }}
+                                        {% if submission.code.split('\n')[0]|length > 50 %}...{% endif %}
+                                    {% else %}
+                                        [Empty submission]
+                                    {% endif %}
+                                </h6>
+                                <small>{{ submission.timestamp.strftime('%b %d, %H:%M') if submission.timestamp else 'N/A' }}</small>
+                            </div>
+                            <div class="d-flex w-100 justify-content-between">
+                                <small class="text-muted">
+                                    {% if submission.code %}
+                                        {{ (submission.code.split('\n')|length) }} lines
+                                    {% else %}
+                                        0 lines
+                                    {% endif %}
+                                </small>
+                                <small>
+                                    {% if submission.grade and not submission.grade.endswith('in progress...') %}
+                                        {% if 'Grade: A' in submission.grade %}
+                                            <span class="badge bg-success">A</span>
+                                        {% elif 'Grade: B' in submission.grade %}
+                                            <span class="badge bg-primary">B</span>
+                                        {% elif 'Grade: C' in submission.grade %}
+                                            <span class="badge bg-warning text-dark">C</span>
+                                        {% elif 'Grade: D' in submission.grade %}
+                                            <span class="badge bg-danger">D</span>
+                                        {% elif 'Grade: F' in submission.grade %}
+                                            <span class="badge bg-danger">F</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">?</span>
+                                        {% endif %}
+                                    {% else %}
+                                        <span class="badge bg-secondary">
+                                            <i class="fas fa-spinner fa-spin"></i>
+                                        </span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center p-4">
+                        <i class="fas fa-code-branch fa-3x mb-3 text-muted"></i>
+                        <p>No submissions yet. Submit your first code for analysis!</p>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">Go to Dashboard</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Add error handling for when submissions can't be loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if we have an error from the server (passed in a flash message)
+        const errorElement = document.getElementById('submission-load-error');
+        if (errorElement) {
+            // Show error and add retry button functionality
+            const retryButton = document.getElementById('retry-load-submissions');
+            if (retryButton) {
+                retryButton.addEventListener('click', function() {
+                    window.location.reload();
+                });
+            }
+        }
+    });
+</script>
+{% endblock %}

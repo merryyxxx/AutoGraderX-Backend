@@ -1,0 +1,79 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Privacy Policy</h2>
+                </div>
+                <div class="card-body">
+                    <h3>1. Introduction</h3>
+                    <p>This Privacy Policy describes how {{ app_name }} ("we", "our", or "us") collects, uses, and shares information about you when you use our website and services. We respect your privacy and are committed to protecting your personal data.</p>
+                    
+                    <h3>2. Information We Collect</h3>
+                    <p>We collect the following types of information:</p>
+                    <ul>
+                        <li><strong>Account Information:</strong> When you register, we collect your username and securely store your password.</li>
+                        <li><strong>Code Submissions:</strong> We collect and store the code you submit for analysis.</li>
+                        <li><strong>Usage Information:</strong> We collect information about how you interact with our service, including submission timestamps and analysis results.</li>
+                        <li><strong>Log Data:</strong> Our servers automatically record information including your IP address, browser type, and the pages you visit.</li>
+                    </ul>
+                    
+                    <h3>3. How We Use Your Information</h3>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Provide, maintain, and improve our services</li>
+                        <li>Process and analyze your code submissions</li>
+                        <li>Authenticate users and provide account features</li>
+                        <li>Monitor and analyze usage patterns and trends</li>
+                        <li>Detect, investigate, and prevent security incidents</li>
+                    </ul>
+                    
+                    <h3>4. AI Processing</h3>
+                    <p>Your code submissions are processed using Google's Gemini AI service. Please note:</p>
+                    <ul>
+                        <li>Code you submit is sent to Google's API for analysis</li>
+                        <li>The AI processing is governed by both our privacy policy and Google's privacy policies</li>
+                        <li>We take reasonable measures to ensure the security of data transmission to third-party AI services</li>
+                    </ul>
+                    
+                    <h3>5. Data Storage and Security</h3>
+                    <p>We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet or electronic storage is 100% secure. Your code submissions and analysis results are stored in our database for your future reference.</p>
+                    
+                    <h3>6. Data Retention</h3>
+                    <p>We retain your personal information and code submissions for as long as your account remains active or as needed to provide you services. You may request deletion of your account and associated data at any time.</p>
+                    
+                    <h3>7. Your Rights</h3>
+                    <p>Depending on your location, you may have certain rights regarding your personal information, including:</p>
+                    <ul>
+                        <li>Access to your personal information</li>
+                        <li>Correction of inaccurate data</li>
+                        <li>Deletion of your personal information</li>
+                        <li>Restriction of processing of your personal information</li>
+                        <li>Data portability</li>
+                    </ul>
+                    
+                    <h3>8. Cookies</h3>
+                    <p>We use session cookies to maintain your login state. These cookies are essential for the functioning of our service and expire when you close your browser or after 30 minutes of inactivity.</p>
+                    
+                    <h3>9. Third-Party Services</h3>
+                    <p>Our service uses Google's Gemini AI API. Your interactions with this third-party service are governed by their respective privacy policies.</p>
+                    
+                    <h3>10. Children's Privacy</h3>
+                    <p>Our service is not directed to children under 13 years of age. We do not knowingly collect personal information from children under 13.</p>
+                    
+                    <h3>11. Changes to This Privacy Policy</h3>
+                    <p>We may update our Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the date at the bottom.</p>
+                    
+                    <h3>12. Contact Us</h3>
+                    <p>If you have any questions about this Privacy Policy, please contact us at [Your Contact Information].</p>
+                    
+                    <p class="text-muted mt-4">Last updated: {{ now.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

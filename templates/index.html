@@ -1,0 +1,122 @@
+{% extends "layout.html" %}
+
+{% block title %}AutoGraderX{% endblock %}
+
+{% block content %}
+<div class="row align-items-center">
+    <div class="col-lg-6 fade-in">
+        <h1 class="display-4 fw-bold mb-4">Elevate Your Code with <span style="color: var(--primary-color);">AI-Powered Grading</span></h1>
+        <p class="lead mb-4">AutoGraderX uses advanced AI to review your code, provide detailed analysis, suggest improvements, and grade your submissions to help you become a better programmer.</p>
+        <div class="d-grid gap-2 d-md-flex justify-content-md-start mb-4">
+            {% if is_logged_in() %}
+            <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-4 me-md-2">Go to Dashboard</a>
+            {% else %}
+            <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-4 me-md-2">Get Started</a>
+            <a href="{{ url_for('login') }}" class="btn btn-outline-primary btn-lg px-4">Login</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="col-lg-6 text-center fade-in">
+        <img src="{{ url_for('static', filename='images/picture.png') }}" alt=" class="img-fluid rounded shadow-lg">
+    </div>
+</div>
+
+<div class="row my-5 pt-5">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold">How It <span style="color: var(--primary-color);">Works</span></h2>
+        <p class="lead">Simple process, powerful results</p>
+    </div>
+</div>
+
+<div class="row mb-5">
+    <div class="col-md-4 mb-4 fade-in">
+        <div class="card h-100">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-code fa-3x" style="color: var(--primary-color);"></i>
+                </div>
+                <h4 class="card-title">1. Submit Your Code</h4>
+                <p class="card-text">Paste your code to start the analysis process. We support multiple programming languages.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4 fade-in">
+        <div class="card h-100">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-robot fa-3x" style="color: var(--primary-color);"></i>
+                </div>
+                <h4 class="card-title">2. AI Analysis</h4>
+                <p class="card-text">Our AI engine analyzes your code, identifies potential issues, and suggests improvements.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4 fade-in">
+        <div class="card h-100">
+            <div class="card-body text-center py-4">
+                <div class="mb-3">
+                    <i class="fas fa-award fa-3x" style="color: var(--primary-color);"></i>
+                </div>
+                <h4 class="card-title">3. Get Graded</h4>
+                <p class="card-text">Receive a comprehensive grade along with detailed feedback to help you improve your coding skills.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-5 py-5 bg-light rounded-3">
+    <div class="col-12 text-center mb-4">
+        <h2 class="fw-bold">Key <span style="color: var(--primary-color);">Features</span></h2>
+        <p class="lead">What makes AutoGraderX special</p>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4 fade-in">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-file-code fa-2x mb-3" style="color: var(--primary-color);"></i>
+                <h5 class="card-title">Detailed Analysis</h5>
+                <p class="card-text">Get clear explanations of what your code does and how it works.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-4 fade-in">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-code-branch fa-2x mb-3" style="color: var(--primary-color);"></i>
+                <h5 class="card-title">Code Restructuring</h5>
+                <p class="card-text">See how your code can be improved and restructured for better readability and efficiency.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-4 fade-in">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-graduation-cap fa-2x mb-3" style="color: var(--primary-color);"></i>
+                <h5 class="card-title">Educational Grading</h5>
+                <p class="card-text">Receive a letter grade with constructive feedback to help you learn and improve.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-lg-3 mb-4 fade-in">
+        <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body text-center p-4">
+                <i class="fas fa-history fa-2x mb-3" style="color: var(--primary-color);"></i>
+                <h5 class="card-title">Submission History</h5>
+                <p class="card-text">Track your progress over time by viewing all your past submissions and grades.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row my-5">
+    <div class="col-md-6 offset-md-3 text-center">
+        <h2 class="fw-bold mb-4">Ready to improve your coding skills?</h2>
+        <p class="lead mb-4">Join students and developers who use AutoGraderX to write better code and track their progress.</p>
+        {% if is_logged_in() %}
+        <a href="{{ url_for('dashboard') }}" class="btn btn-primary btn-lg px-5">Go to Dashboard</a>
+        {% else %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg px-5">Get Started Now</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,156 @@
+{% extends "layout.html" %}
+
+{% block extra_head %}
+<style>
+    .login-container {
+        max-width: 450px;
+        margin: 3rem auto;
+        padding: 2.5rem;
+        background-color: #fff;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+    
+    .login-container:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 30px rgba(74, 108, 247, 0.15);
+    }
+    
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 500;
+        color: #444;
+        font-size: 0.95rem;
+        letter-spacing: 0.5px;
+    }
+    
+    .form-control {
+        width: 100%;
+        padding: 0.9rem 1rem;
+        font-size: 1rem;
+        border: 2px solid #e8e8e8;
+        border-radius: 8px;
+        font-family: 'Roboto', sans-serif;
+        transition: border-color 0.3s, box-shadow 0.3s;
+        background-color: #f9fafc;
+    }
+    
+    .form-control:focus {
+        outline: none;
+        border-color: #4a6cf7;
+        box-shadow: 0 0 0 3px rgba(74, 108, 247, 0.15);
+    }
+    
+    .btn-primary {
+        display: block;
+        width: 100%;
+        padding: 0.9rem;
+        background-color: #4a6cf7;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        cursor: pointer;
+        transition: all 0.3s;
+        box-shadow: 0 4px 12px rgba(74, 108, 247, 0.25);
+    }
+    
+    .btn-primary:hover {
+        background-color: #3a5ce5;
+        box-shadow: 0 6px 15px rgba(74, 108, 247, 0.35);
+        transform: translateY(-2px);
+    }
+    
+    .btn-primary:active {
+        transform: translateY(0);
+    }
+    
+    .links-container {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1.5rem;
+        padding-top: 1rem;
+        border-top: 1px solid #eaeaea;
+    }
+    
+    .register-link, .reset-link {
+        font-size: 0.95rem;
+    }
+    
+    .register-link a, .reset-link a {
+        color: #4a6cf7;
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.2s;
+    }
+    
+    .register-link a:hover, .reset-link a:hover {
+        color: #3a5ce5;
+        text-decoration: underline;
+    }
+    
+    .form-header {
+        text-align: center;
+        margin-bottom: 2.5rem;
+    }
+    
+    .form-header i {
+        font-size: 2.5rem;
+        color: #4a6cf7;
+        margin-bottom: 1.25rem;
+        display: inline-block;
+        background: linear-gradient(135deg, #4a6cf7, #6a4cf7);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+    
+    .form-header h1 {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 0.75rem;
+        font-weight: 700;
+    }
+    
+    .form-header p {
+        color: #666;
+        font-size: 1.05rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <div class="form-header">
+        <i class="fas fa-sign-in-alt"></i>
+        <h1>Welcome Back!</h1>
+        <p>Log in to access your AutoGraderX dashboard</p>
+    </div>
+    <form method="POST" action="{{ url_for('login') }}">
+        <div class="form-group">
+            <label for="username">Email Address</label>
+            <input type="email" class="form-control" id="username" name="username" placeholder="your@email.com" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" class="form-control" id="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn-primary">Sign In</button>
+    </form>
+    <div class="links-container">
+        <div class="register-link">
+            <a href="{{ url_for('register') }}">Create an account</a>
+        </div>
+        <div class="reset-link">
+            <a href="{{ url_for('reset_password') }}">Forgot password?</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

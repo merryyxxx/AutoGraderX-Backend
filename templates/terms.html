@@ -1,0 +1,68 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="container my-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="mb-0">Terms of Service</h2>
+                </div>
+                <div class="card-body">
+                    <h3>1. Acceptance of Terms</h3>
+                    <p>By accessing or using the {{ app_name }} service ("Service"), you agree to be bound by these Terms of Service. If you do not agree to these terms, please do not use the Service.</p>
+                    
+                    <h3>2. Description of Service</h3>
+                    <p>{{ app_name }} is an automated code analysis and grading platform that uses AI technology to analyze, restructure, and grade code submissions.</p>
+                    
+                    <h3>3. User Accounts</h3>
+                    <p>To use certain features of the Service, you must register for an account. You are responsible for maintaining the confidentiality of your account information and for all activities that occur under your account.</p>
+                    
+                    <h3>4. User Conduct</h3>
+                    <p>You agree not to:</p>
+                    <ul>
+                        <li>Submit code that contains malicious content, including but not limited to malware, viruses, or code designed to harm systems</li>
+                        <li>Use the Service to engage in any illegal activity</li>
+                        <li>Attempt to gain unauthorized access to the Service or other users' accounts</li>
+                        <li>Use the Service to infringe on intellectual property rights</li>
+                        <li>Overwhelm or burden the Service through excessive submissions or requests</li>
+                    </ul>
+                    
+                    <h3>5. Code Submissions</h3>
+                    <p>By submitting code to the Service:</p>
+                    <ul>
+                        <li>You retain all ownership rights to your submitted code</li>
+                        <li>You grant us a non-exclusive license to analyze, process, and store your code for the purpose of providing the Service</li>
+                        <li>You understand that AI analysis may not be perfect and should not be relied upon for critical applications without human verification</li>
+                    </ul>
+                    
+                    <h3>6. AI Analysis and Grading</h3>
+                    <p>The Service uses Google's Gemini AI to analyze and grade code. While we strive for accuracy, you acknowledge that:</p>
+                    <ul>
+                        <li>AI analysis may contain errors or inaccuracies</li>
+                        <li>The grading system is subjective and should be used for educational purposes only</li>
+                        <li>We do not guarantee specific outcomes or improvements to your code</li>
+                    </ul>
+                    
+                    <h3>7. Intellectual Property</h3>
+                    <p>All content, features, and functionality of the Service, including but not limited to the design, software, and text, are owned by us or our licensors and are protected by copyright, trademark, and other intellectual property laws.</p>
+                    
+                    <h3>8. Limitation of Liability</h3>
+                    <p>To the fullest extent permitted by law, we shall not be liable for any indirect, incidental, special, consequential, or punitive damages resulting from your use or inability to use the Service.</p>
+                    
+                    <h3>9. Termination</h3>
+                    <p>We reserve the right to terminate or suspend your account and access to the Service at our sole discretion, without notice, for conduct that we believe violates these Terms or is harmful to other users of the Service, us, or third parties, or for any other reason.</p>
+                    
+                    <h3>10. Changes to Terms</h3>
+                    <p>We reserve the right to modify these Terms at any time. We will provide notice of significant changes by updating the date at the top of these Terms and by maintaining a current version of the Terms on this page.</p>
+                    
+                    <h3>11. Contact Information</h3>
+                    <p>If you have any questions about these Terms, please contact us at [Your Contact Information].</p>
+                    
+                    <p class="text-muted mt-4">Last updated: {{ now.strftime('%B %d, %Y') }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
